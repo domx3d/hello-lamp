@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="images/light-bulb.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
+    <title>Hello lamp</title>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="/" class="navbar-brand">HELLO LAMP</a>
+      <div class="navbar-right show-instructions">
+          <img class="bulb-icon" src="images/light-bulb.svg" alt=""></img>
+          <div class="instructions">
+            <img src="images/instructions.jpg" alt="" class="hover-image">
+          </div>  
+      </div>
+    </nav>
+
+    <div id="app"></div>
+    <div class="loading" id="loadScreen">
+      <img src="images/loading-bar.gif" alt="loading...">
+    </div>
+    <canvas id="c"></canvas>
+    <div>
+      <label><input type="color" id="colorpicker"></label>
+    </div>
+    
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
