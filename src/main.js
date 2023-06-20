@@ -46,6 +46,11 @@ controls.maxPolarAngle = Math.PI / 2;
 controls.minAzimuthAngle = Math.PI + 0.05; 
 controls.maxAzimuthAngle = Math.PI * 2 - 0.05; 
 
+// render on demand
+controls.addEventListener('change', () => {
+  render()
+});
+
 // point light
 const light = new THREE.PointLight("#ffffff");
 light.position.set(-3, 0, -0.5);
@@ -53,6 +58,12 @@ light.intensity = 2;
 light.distance = 4.3;
 light.decay = 1;
 scene.add(light)
+
+// point light
+const light2 = new THREE.AmbientLight("#ffffff");
+light2.position.set(-3, 0, -0.5);
+light2.intensity = 0.05;
+scene.add(light2)
 
 // spot light
 const spotLight = new THREE.SpotLight(0xffffff, 2);
@@ -143,6 +154,7 @@ colorPicker.addEventListener("input", (event) => {
   navBrand.style.color = color;
   bulb.material.emissive.set(color)
   spotLight.color.set(color);
+  render();
 });
 
 
@@ -166,7 +178,7 @@ function onMouseDown(event) {
       pressed = true;
       controls.enabled = false;
     } else if(intersects[0].object.parent.name === 'control_panel') {
-      //console.log("show picker")
+      console.log("show picker")
       //colorPicker.click();      
       colorPicker.showPicker();
     }
@@ -180,6 +192,7 @@ function onMouseup(event) {
     mouseX_delta = 0;
     mouseY_delta = 0;
   }
+  render();
 }
 
 function onMouseMove(event) {
@@ -195,8 +208,8 @@ function onMouseMove(event) {
 
     mouseX_delta = mouseX;
     mouseY_delta = mouseY;
+    render();
   }
-  
 }
 
 // mouse events
@@ -226,14 +239,17 @@ function render(time) {
     // move the elem to that position
     colorPicker.style.translate = `${x-30}px ${y-40}px`;
   }
-
   renderer.render(scene, camera);  
   
-  requestAnimationFrame(render);
+  //requestAnimationFrame(render);
 }
   
-requestAnimationFrame(render);
-  
+//requestAnimationFrame(render);
+render();
+
+window.addEventListener('resize', () => {
+  render();
+});
 
 // resize window
 function resizeRendererToDisplaySize(renderer) {
@@ -275,6 +291,7 @@ function setLoadManager() {
     const loadingScreen = document.getElementById( 'loadScreen' );	
     loadingScreen.remove();
     loading = false;
+    render();
   };
 
   manager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
