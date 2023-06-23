@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GUI } from 'dat.gui';
 
 
 // variables
-let lamp_case, bulb, glass, foil;
+let lamp_case, bulb, glass, foil, chair;
 let loading;
 let colorButton;
 let pressed = false;
@@ -22,6 +23,8 @@ const scene = new THREE.Scene();
 // renderer
 const canvas = document.querySelector('#c');
 const renderer = new THREE.WebGLRenderer({canvas, antialias: true, });
+renderer.useLegacyLights = false;
+renderer.shadowMap.enabled = true;
 
 // camera
 const camera = new THREE.PerspectiveCamera(45, 
@@ -30,6 +33,11 @@ camera.position.z = 10;
 camera.position.y = 20;
 camera.position.x = -20;
 scene.add(camera);
+
+// GUI
+const gui = new GUI();
+gui.close();
+
 
 // orbit controls
 const controls = new OrbitControls(camera, canvas);
@@ -54,23 +62,26 @@ controls.addEventListener('change', () => {
 // point light
 const light = new THREE.PointLight("#ffffff");
 light.position.set(-3, 0, -0.5);
-light.intensity = 2;
+light.intensity = 20;
 light.distance = 4.3;
 light.decay = 1;
 scene.add(light)
 
-// point light
+// ambient light
 const light2 = new THREE.AmbientLight("#ffffff");
 light2.position.set(-3, 0, -0.5);
-light2.intensity = 0.05;
+light2.intensity = 0.5;
 scene.add(light2)
 
 // spot light
-const spotLight = new THREE.SpotLight(0xffffff, 2);
+const spotLight = new THREE.SpotLight(0xffffff, 5000);
 spotLight.angle = 0.5; // Set spotlight angle to 0.5 radians
 spotLight.penumbra = 0.1; // Set spotlight penumbra
 spotLight.castShadow = true;
+spotLight.shadow.mapSize.width = 512*2; // default
+spotLight.shadow.mapSize.height = 512*2; // default
 const helper = new THREE.SpotLightHelper(spotLight);
+
 
 // gltf loader
 const loader = new GLTFLoader(setLoadManager());
@@ -117,8 +128,7 @@ loader.load('./objects/lamp.gltf',
 
     lamp_case.add(spotLight);
     lamp_case.add(spotLight.target);
-  }
-);
+ });
 
 // load color panel
 loader.load('./objects/color_panel.gltf',
@@ -126,8 +136,6 @@ loader.load('./objects/color_panel.gltf',
     colorButton = gltf.scene;
     colorButton.position.set(0,-2,10)
     colorButton.name = 'colorButton'
-    colorButton.castShadow = true;
-    colorButton.receiveShadow = true;
     scene.add(colorButton);
     //console.log(dumpObject(colorButton).join('\n'));
   },
@@ -140,12 +148,30 @@ loader.load('./objects/room/test.gltf',
     room.scale.set(5,5,5);
     room.position.y = -12.5;
     room.position.x = -24.75;
-    room.receiveShadow = true;
+    room.children[0].children[0].receiveShadow = true;
+    room.children[0].children[1].receiveShadow = true;
     scene.add(room);
     //console.log(dumpObject(room).join('\n'));
+
   }
 );
 
+// load chair
+loader.load('./objects/chair/chair.glb',
+  (gltf) => {
+    chair = gltf.scene;
+    chair.scale.set(20,20,20)
+    chair.position.set(-9,-12,-30)
+    chair.children[0].castShadow = true;
+    chair.children[0].children[0].castShadow = true;
+    chair.children[0].children[5].castShadow = true;
+    chair.children[0].children[6].castShadow = true;
+    chair.children[0].children[7].castShadow = true;
+    scene.add(chair);
+    addToGui("chair");
+    //console.log(dumpObject(chair).join('\n'));
+  }
+);
 
 // color picker
 const colorPicker = document.getElementById("colorpicker");
@@ -156,6 +182,10 @@ colorPicker.addEventListener("input", (event) => {
   spotLight.color.set(color);
   render();
 });
+
+
+
+
 
 
 // raycaster
@@ -262,6 +292,21 @@ function resizeRendererToDisplaySize(renderer) {
   }
   return needResize;
 }
+
+
+// dat.gui
+function addToGui(obj) {
+  if(obj==='chair') {
+    const folderPos = gui.addFolder("position");
+    folderPos.add(chair.position, 'x', -35, -9).onChange(() => {render()});
+    folderPos.add(chair.position, 'z', -32, 16).onChange(() => {render()});
+    folderPos.open();
+    const folderRot = gui.addFolder("rotation");
+    folderRot.add(chair.rotation, 'y', -Math.PI * 2, Math.PI * 2).onChange(() => {render()});
+    folderRot.open();
+  }
+}
+
 
 
 // show loaded objects tree in console

@@ -4,6 +4,10 @@ html, body {
   overflow: hidden;
   background-color: black;
 }
+
+.dg {
+  z-index: 5 !important;
+}
 #colorpicker {
   z-index: 2;
   visibility: hidden;
@@ -77,18 +81,6 @@ html, body {
   border: 2px solid rgb(247, 135, 30);
   border-radius: 50%;
 }
-
-.title {
-  color: white;
-  z-index: 2;
-  position: absolute;
-  font-size: 3rem;
-  left: 50%;
-  top: 75%;
-  transform: translate(-50%, -75%);
-}
-
-
 
 .loading {
   display: flex;
